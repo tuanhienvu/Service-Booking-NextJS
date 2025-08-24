@@ -1,0 +1,109 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model category {
+  id               Int               @id @default(autoincrement()) @db.SmallInt
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  title            String?
+  order            order[]
+  serviceProviders serviceProvider[]
+}
+
+model review {
+  id                Int      @id @default(autoincrement()) @db.SmallInt
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  rating            Float?
+  message           String?  @db.VarChar
+  adminId           Int?     @db.SmallInt
+  customerId        Int?     @db.SmallInt
+  orderId           Int?     @unique @db.SmallInt
+  serviceProviderId Int?     @db.SmallInt
+  admin             user?    @relation("AdminReviews", fields: [adminId], references: [id], onDelete: SetDefault)
+  customer          user?    @relation("CustomerReviews", fields: [customerId], references: [id], onDelete: Cascade)
+  order             order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serviceProvider   user?    @relation("ServiceProviderReviews", fields: [serviceProviderId], references: [id], onDelete: Cascade)
+}
+
+model serviceProvider {
+  id          Int       @id @default(autoincrement()) @db.SmallInt
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  price       Float?    @default(0)
+  about       String?
+  location    String?
+  categoryId  Int?      @db.SmallInt
+  isAvailable Boolean   @default(true)
+  category    category? @relation(fields: [categoryId], references: [id], onDelete: SetDefault)
+}
+
+model user {
+  id                      Int            @id(map: "User_pkey") @default(autoincrement()) @db.SmallInt
+  created_at              DateTime       @default(now()) @db.Timestamptz(6)
+  first_name              String?
+  last_name               String?
+  imageUrl                String?
+  email                   String?
+  uuid                    String?        @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  isActive                Boolean        @default(true)
+  role                    String?        @default("customer")
+  address                 String?
+  phone                   String?
+  password                String?        // Hashed password for authentication
+  notifications           notification[]
+  customerBookings        order[]        @relation("CustomerBookings")
+  serviceProviderBookings order[]        @relation("ServiceProviderBookings")
+  adminReviews            review[]       @relation("AdminReviews")
+  customerReviews         review[]       @relation("CustomerReviews")
+  serviceProviderReviews  review[]       @relation("ServiceProviderReviews")
+}
+
+model order {
+  id                Int             @id @default(autoincrement()) @db.SmallInt
+  created_at        DateTime        @default(now()) @db.Timestamptz(6)
+  date              String?
+  time              String?
+  location          String?
+  categoryId        Int?            @db.SmallInt
+  uuid              String?         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  amount            Float?          @default(0)
+  status            String?         @default("Pending")
+  paymentIntentId   String?
+  completedDate     DateTime?
+  customerId        Int?            @db.SmallInt
+  notes             String?
+  scheduledDate     DateTime?
+  serviceProviderId Int?            @db.SmallInt
+  notifications     notification[]
+  customer          user?           @relation("CustomerBookings", fields: [customerId], references: [id], onDelete: Cascade)
+  serviceProvider   user?           @relation("ServiceProviderBookings", fields: [serviceProviderId], references: [id], onDelete: SetDefault)
+  category          category?       @relation(fields: [categoryId], references: [id], onDelete: SetDefault, map: "public_order_categoryId_fkey")
+  services          orderServices[]
+  review            review?
+}
+
+model orderServices {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  title      String?
+  quantity   Int?     @default(0) @db.SmallInt
+  orderId    Int?     @db.SmallInt
+  order      order?   @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "public_orderServices_orderId_fkey")
+}
+
+model notification {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  type       String
+  message    String
+  userId     Int      @db.SmallInt
+  orderId    Int?     @db.SmallInt
+  isRead     Boolean  @default(false)
+  order      order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
