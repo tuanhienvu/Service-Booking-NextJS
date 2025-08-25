@@ -149,13 +149,28 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
                 className="menu menu-compact dropdown-content mt-3 p-2 shadow-lg bg-slate-800 rounded-box w-52 border border-slate-700"
               >
                 <li>
-                  <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/about">
-                    About Us
+                  <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/categories">
+                    Categories
                   </Link>
                 </li>
                 <li>
                   <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/services">
                     Services
+                  </Link>
+                </li>
+                <li>
+                  <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/booking">
+                    Booking
+                  </Link>
+                </li>
+                <li>
+                  <Link className="menu-link text-white hover:text-primary focus:text-primary" href="/about">
+                    About Us
                   </Link>
                 </li>
               </ul>
@@ -174,13 +189,28 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
           {/* Desktop Navigation */}
           <ul className="menu menu-horizontal px-1 text-white hidden lg:flex">
             <li>
-              <Link className="text-white hover:text-primary focus:text-primary" href="/about">
-                About Us
+              <Link className="text-white hover:text-primary focus:text-primary" href="/">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link className="text-white hover:text-primary focus:text-primary" href="/categories">
+                Categories
               </Link>
             </li>
             <li>
               <Link className="text-white hover:text-primary focus:text-primary" href="/services">
                 Services
+              </Link>
+            </li>
+            <li>
+              <Link className="text-white hover:text-primary focus:text-primary" href="/booking">
+                Booking
+              </Link>
+            </li>
+            <li>
+              <Link className="text-white hover:text-primary focus:text-primary" href="/about">
+                About Us
               </Link>
             </li>
           </ul>

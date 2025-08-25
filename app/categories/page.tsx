@@ -85,11 +85,6 @@ const CategoriesPage = () => {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    // Apply search and filters whenever they change
-    applySearchAndFilters();
-  }, [searchQuery, searchFilters, categories]);
-
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -127,7 +122,7 @@ const CategoriesPage = () => {
   };
 
   // Apply search and filters
-  const applySearchAndFilters = () => {
+  const applySearchAndFilters = useCallback(() => {
     let filtered = [...categories];
 
     // Normal search through all fields
@@ -161,7 +156,12 @@ const CategoriesPage = () => {
     // Recalculate total pages for filtered results
     const newTotalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(newTotalPages);
-  };
+  }, [searchQuery, searchFilters, categories, itemsPerPage]);
+
+  // Apply search and filters whenever they change
+  useEffect(() => {
+    applySearchAndFilters();
+  }, [searchQuery, searchFilters, categories, applySearchAndFilters]);
 
   // Clear all search and filters
   const clearSearchAndFilters = () => {
@@ -227,7 +227,7 @@ const CategoriesPage = () => {
   };
 
   // Generate page numbers with smart ellipsis
-  const generatePageNumbers = () => {
+  const generatePageNumbers = useCallback(() => {
     const pages = [];
 
     // Always show all pages if total is 10 or less
@@ -265,25 +265,24 @@ const CategoriesPage = () => {
     }
 
     return pages;
-  };
+  }, [totalPages, currentPage]);
 
   // Debug function to check pagination state
-  const debugPagination = () => {
+  const debugPagination = useCallback(() => {
     console.log('Debug Pagination:', {
       totalPages,
       currentPage,
       categoriesLength: categories.length,
       filteredLength: filteredCategories.length,
       itemsPerPage,
-      pageNumbers: generatePageNumbers(),
     });
-  };
+  }, [totalPages, currentPage, categories.length, filteredCategories.length, itemsPerPage]);
 
   useEffect(() => {
     if (totalPages > 1) {
       debugPagination();
     }
-  }, [totalPages, currentPage, categories.length, filteredCategories.length]);
+  }, [totalPages, currentPage, categories.length, filteredCategories.length, debugPagination]);
 
   if (loading) {
     return (
